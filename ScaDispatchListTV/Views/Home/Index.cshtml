@@ -1,13 +1,35 @@
 ﻿@{
     ViewData["Title"] = "ScaDispatchList View";
+    string[] TableHeaders = new string[] 
+    {
+        "Klient"
+        ,"Zamówienie"
+        ,"Nazwa"
+        ,"Il.zam"
+        ,"Stan"
+        ,"Gotowość"
+        ,"Data wys."
+    };
 }
 <div class="table">
-    <table>
+    <table class="table table-bordered table-hover">
         <thead>
             <tr>
-                <th> </th>
+                @{
+                    foreach (var head in TableHeaders)
+                    {
+                        <th>
+                            @head
+                        </th>
+                    }
+                }
             </tr>
         </thead>
+        <tr>
+            <td>
+
+            </td>
+        </tr>
         <tbody>
 
         </tbody>
