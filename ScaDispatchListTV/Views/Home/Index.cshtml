@@ -2,13 +2,13 @@
     ViewData["Title"] = "ScaDispatchList View";
     string[] TableHeaders = new string[] 
     {
-        "Klient"
-        ,"Zamówienie"
-        ,"Nazwa"
-        ,"Il.zam"
-        ,"Stan"
-        ,"Gotowość"
-        ,"Data wys."
+        "Klient",
+        "Zamówienie",
+        "Nazwa",
+        "Il.zam",
+        "Stan",
+        "Gotowość",
+        "Data wys."
     };
 }
 <div class="table">
@@ -25,13 +25,26 @@
                 }
             </tr>
         </thead>
-        <tr>
-            <td>
-
-            </td>
-        </tr>
+        
         <tbody>
-
+            @{
+            if (Model != null)
+            {
+                foreach (var Data in Model)
+                {
+                    <tr>
+                        <td>@Data.Klient</td
+                        <td></td>
+                        <td>@Data.Zamowienie</td>                        
+                        <td>@Data.Nazwa</td>
+                        <td>@Data.IlZam</td>
+                        <td>@Data.Stan</td>
+                        <td>@Data.Got</td>
+                        <td>@Data.DataWys</td>
+                    </tr>
+                }
+            }
+        }
         </tbody>
     </table>
 </div>

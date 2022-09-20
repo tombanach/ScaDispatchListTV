@@ -23,25 +23,36 @@ namespace ScaDispatchListTV.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            FetchData();
+            return View(orders);
         }
 
         private void FetchData()
         {
+            if (orders.Count > 0)
+            {
+                orders.Clear();
+            }
             try
             {
                 con.Open();
                 com.Connection = con;
-                com.CommandText = "SELECT TOP(30) Klient, Zamówienie, Nazwa, [Il.zam], Stan, ISNULL(Got, 0) Got, [Data wys] " +
+                com.CommandText = "SELECT TOP(50) Klient, Zamówienie, Nazwa, [Il.zam], Stan, ISNULL(Got, 0) Got, [Data wys] " +
                     "FROM SmayDB.dbo.ExScaDispatchListWMS " +
                     "WHERE ([Data wys] = CAST( GETDATE() AS Date )) " +
                     "ORDER BY Klient";
                 dr = com.ExecuteReader();
                 while (dr.Read())
                 {
-                    orders.Add(new Order() {Klient = dr["Klient"].ToString(),
-                    Zamowienie = dr["Zamówienie"].ToString(),
-                    Nazwa = dr["Nazwa"].ToString(),
+                    orders.Add(new Order() 
+                    {
+                        Klient = dr["Klient"].ToString(),
+                        Zamowienie = dr["Zamówienie"].ToString(),
+                        Nazwa = dr["Nazwa"].ToString(),
+                        IlZam = dr["Il.zam"].ToString(),
+                        Stan = dr["Stan"].ToString(),
+                        Got = dr["Got"].ToString(),
+                        DataWys = dr["Data wys"].ToString()
                     });
                 }
                 con.Close();
