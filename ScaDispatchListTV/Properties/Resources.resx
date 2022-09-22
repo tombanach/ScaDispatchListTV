@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ConnectionString" xml:space="preserve">
-    <value>Data Source=krk-sca1;Initial Catalog=Tomek;Integrated Security=True</value>
+    <value>Data Source=krk-db2;Integrated Security=True</value>
     <comment>SQL Server Connection</comment>
   </data>
 </root>

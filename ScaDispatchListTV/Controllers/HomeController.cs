@@ -37,8 +37,8 @@ namespace ScaDispatchListTV.Controllers
             {
                 con.Open();
                 com.Connection = con;
-                com.CommandText = "SELECT TOP(50) Klient, Zamówienie, Nazwa, [Il.zam], Stan, ISNULL(Got, 0) Got, [Data wys] " +
-                    "FROM SmayDB.dbo.ExScaDispatchListWMS " +
+                com.CommandText = "SELECT  Klient, Zamówienie, Nazwa, [Il.zam], ISNULL(Got, 0) Got, [Data wys] " +
+                    "FROM SmayDB.dbo.ExScaDispatchListWMS_TEMP " +
                     "WHERE ([Data wys] = CAST( GETDATE() AS Date )) " +
                     "ORDER BY Klient";
                 dr = com.ExecuteReader();
@@ -50,7 +50,6 @@ namespace ScaDispatchListTV.Controllers
                         Zamowienie = dr["Zamówienie"].ToString(),
                         Nazwa = dr["Nazwa"].ToString(),
                         IlZam = dr["Il.zam"].ToString(),
-                        Stan = dr["Stan"].ToString(),
                         Got = dr["Got"].ToString(),
                         DataWys = dr["Data wys"].ToString()
                     });
