@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "ScaDispatchList View";
+    ViewData["Title"] = "ScaDispatchListTV";
     string[] TableHeaders = new string[] 
     {
         "Klient",
@@ -10,8 +10,12 @@
         "Data wys."
     };
 }
-<div class="table">
-    <table class="table table-bordered table-hover">
+<head>   
+    <h3>ScaDispatchList</h3>    
+</head>
+<br />
+<body>
+    <table class="table">
         <thead>
             <tr>
                 @{
@@ -45,4 +49,11 @@
         }
         </tbody>
     </table>
-</div>
+</body>
+
+
+@*<div class="table">
+    <table class="table table-bordered table-hover">
+        
+    </table>
+</div>*@
