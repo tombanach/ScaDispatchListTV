@@ -61,7 +61,7 @@ namespace ScaDispatchListTV.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data Source=krk-db2;Integrated Security=True.
+        ///   Looks up a localized string similar to Data Source=krk-db2;Initial Catalog=SmayDB;User ID=asp1;Password=P@$$w0rd.
         /// </summary>
         internal static string ConnectionString {
             get {
