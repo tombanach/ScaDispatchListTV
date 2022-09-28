@@ -18,6 +18,8 @@ namespace ScaDispatchListTV.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+
+            //Przypisanie ConnectionStringa umieszczonego w katalogu Properties -> Resources.resx do zmiennej con.ConnectionString
             con.ConnectionString = ScaDispatchListTV.Properties.Resources.ConnectionString;
         }
 

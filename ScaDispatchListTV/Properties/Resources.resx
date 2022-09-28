@@ -119,6 +119,6 @@
   </resheader>
   <data name="ConnectionString" xml:space="preserve">
     <value>Data Source=krk-db2;Initial Catalog=SmayDB;User ID=asp1;Password=P@$$w0rd</value>
-    <comment>SQL Server Connection</comment>
+    <comment>SQL Server Connection to KRK-DB2</comment>
   </data>
 </root>

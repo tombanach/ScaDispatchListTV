@@ -2,6 +2,7 @@
 {
     public class Order
     {
+        //Model zamówienia - pola pobierane z bazy danych
         public string Klient { get; set; }
         public string Zamowienie { get; set; }
         public string Nazwa { get; set; }

@@ -15,13 +15,15 @@ body {
 }
 
 table {
-    width: 100%;
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 0.9em;
     min-width: 400px;
-    box-shadow: 0px 10px 50px 0px rgba(0,0,0,0.5);
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
     background: #fff;
+    
 }
 
     table thead tr {
@@ -41,12 +43,10 @@ table {
         border-bottom: 1px solid #dddddd;
     }
 
-    table tbody tr:nth-of-type(even) {
-        background-color: #f3f3f3;
-    }
+        table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;            
+        }
 
-    table tbody td {
-        border: 2px solid rgba(0,0,0,0.1);
-        font-weight: 500;
-        font-size: 14px;
-    }
+        table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
