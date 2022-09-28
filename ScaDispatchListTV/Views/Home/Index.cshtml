@@ -10,10 +10,9 @@
         "Data wys."
     };
 }
-<head>   
-    <h3>ScaDispatchList</h3>    
-</head>
-<br />
+
+<h2 class="header">ScaDispatchList</h2>
+
 <body>
     <table class="table">
         <thead>
@@ -36,9 +35,8 @@
                 foreach (var Data in Model)
                 {
                     <tr class="active-row">                        
-                        <td>@Data.Klient</td
-                        <td></td>
-                        <td width="15%">@Data.Zamowienie</td>                        
+                        <td>@Data.Klient</td>
+                        <td>@Data.Zamowienie</td>                        
                         <td>@Data.Nazwa</td>
                         <td>@Data.IlZam</td>
                         <td>@Data.Got</td>
