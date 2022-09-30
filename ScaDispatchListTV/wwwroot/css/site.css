@@ -1,9 +1,12 @@
 .header {
-    font-size: 25px;
+    font-size: 30px;
     font-family: Calibri;
     color: #009879;
     text-align: center;
     font-weight: bold;
+    background-image: url(/resources/logo_smay.png);
+    background-repeat: repeat-y;
+    background-size: 25%;
 }
 
 body {
@@ -12,7 +15,7 @@ body {
     background: lightgrey;
     align-items: center;
     justify-content: center;
-    background-image: url(/resources/background.png);
+    background-image: linear-gradient(#282828, black);
 }
 
 table {
@@ -50,3 +53,7 @@ table {
         table tbody tr:last-of-type {
             border-bottom: 2px solid #009879;
         }
+
+
+
+
