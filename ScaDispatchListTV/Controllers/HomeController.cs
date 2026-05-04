@@ -9,7 +9,6 @@ namespace ScaDispatchListTV.Controllers
     public class HomeController : Controller
     {
         SqlCommand com = new SqlCommand();
-        SqlDataReader dr;
         SqlConnection con = new SqlConnection();
         List<Order> orders = new List<Order>();
 
@@ -49,25 +48,34 @@ namespace ScaDispatchListTV.Controllers
                                     FROM SmayDB.dbo.ExScaDispatchListTV_WMS
                                     WHERE [Data wys] = CAST(GETDATE() AS date)
                                     ORDER BY Klient, Zamówienie";
-                dr = com.ExecuteReader();
+                using var dr = com.ExecuteReader();
                 while (dr.Read())
                 {
                     orders.Add(new Order() 
                     {
-                        Klient = dr["Klient"].ToString(),
-                        Zamowienie = dr["Zamówienie"].ToString(),
-                        Nazwa = dr["Nazwa"].ToString(),
-                        IlZam = dr["Il.zam"].ToString(),
-                        Got = dr["Got"].ToString(),
-                        DataWys = dr["Data wys"].ToString()
+                        Klient = GetString(dr, "Klient"),
+                        Zamowienie = GetString(dr, "Zamówienie"),
+                        Nazwa = GetString(dr, "Nazwa"),
+                        IlZam = GetString(dr, "Il.zam"),
+                        Got = GetString(dr, "Got"),
+                        DataWys = GetString(dr, "Data wys")
                     });
                 }
                 con.Close();
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
+        }
+
+        private static string GetString(SqlDataReader reader, string columnName)
+        {
+            var value = reader[columnName];
+
+            return value == DBNull.Value
+                ? string.Empty
+                : value.ToString() ?? string.Empty;
         }
 
         public IActionResult Privacy()
