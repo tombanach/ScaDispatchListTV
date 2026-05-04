@@ -105,8 +105,8 @@
             <div class="status-title">ScaDispatchList</div>
             <div class="status-meta">
                 <span>Data: @displayDate</span>
-                <span>Odświeżono: @renderTime.ToString("HH:mm:ss", CultureInfo.CurrentCulture)</span>
-                <span>Pozycji: @rows.Count</span>
+                <span>Odśw.: @renderTime.ToString("HH:mm:ss", CultureInfo.CurrentCulture)</span>
+                <span>Poz.: @rows.Count</span>
             </div>
         </div>
         <div class="scroll-progress" aria-hidden="true">
@@ -120,13 +120,7 @@
     }
     else
     {
-        <div class="column-header-bar" aria-hidden="true">
-            @foreach (var head in tableHeaders)
-            {
-                <div>@head</div>
-            }
-        </div>
-        <div class="table-scroll-container" tabindex="0">
+        <div class="table-frame">
             <table class="dispatch-table">
                 <colgroup>
                     <col class="col-client" />
@@ -136,6 +130,14 @@
                     <col class="col-ready" />
                     <col class="col-date" />
                 </colgroup>
+                <thead>
+                    <tr>
+                        @foreach (var head in tableHeaders)
+                        {
+                            <th>@head</th>
+                        }
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var order in rows)
                     {

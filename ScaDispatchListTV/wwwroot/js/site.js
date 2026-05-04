@@ -1,165 +1,156 @@
-(() => {
-    const dashboard = document.querySelector(".tv-page");
-    const scrollContainer = document.querySelector(".table-scroll-container");
-    const progressBar = document.querySelector(".scroll-progress-bar");
+(function () {
+    var dashboard = document.querySelector(".tv-page");
+    var progressBar = document.querySelector(".scroll-progress-bar");
 
-    if (!dashboard || !scrollContainer) {
+    if (!dashboard) {
         return;
     }
 
-    const waitMs = 8000;
-    const resumeAfterManualMs = 10000;
-    const scrollMsPerPixel = 55;
-    const returnDuration = 2500;
-    const scrollKeys = new Set(["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " ", "Spacebar"]);
+    var waitMs = 8000;
+    var resumeAfterManualMs = 10000;
+    var scrollMsPerPixel = 55;
+    var scrollKeys = {
+        ArrowDown: true,
+        ArrowUp: true,
+        PageDown: true,
+        PageUp: true,
+        Home: true,
+        End: true,
+        " ": true,
+        Spacebar: true
+    };
 
-    let runToken = 0;
-    let pausedByUser = false;
-    let resumeTimer;
-    let animationFrame;
+    var scrollTimer = null;
+    var waitTimer = null;
+    var resumeTimer = null;
+    var pausedByUser = false;
+    var programmaticScrollUntil = 0;
 
-    const getMaxScroll = () => Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+    function now() {
+        return new Date().getTime();
+    }
 
-    const updateProgress = () => {
+    function getScrollTop() {
+        return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    }
+
+    function getViewportHeight() {
+        return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
+    }
+
+    function getScrollHeight() {
+        return Math.max(
+            document.documentElement.scrollHeight,
+            document.body ? document.body.scrollHeight : 0
+        );
+    }
+
+    function getMaxScroll() {
+        return Math.max(0, getScrollHeight() - getViewportHeight());
+    }
+
+    function markProgrammaticScroll() {
+        programmaticScrollUntil = now() + 300;
+    }
+
+    function updateProgress() {
         if (!progressBar) {
             return;
         }
 
-        const maxScroll = getMaxScroll();
-        const progress = maxScroll === 0 ? 0 : Math.min(scrollContainer.scrollTop / maxScroll, 1);
-        progressBar.style.width = `${progress * 100}%`;
-    };
+        var maxScroll = getMaxScroll();
+        var progress = maxScroll === 0 ? 0 : Math.min(getScrollTop() / maxScroll, 1);
+        progressBar.style.width = (progress * 100) + "%";
+    }
 
-    const wait = (duration, token) => new Promise(resolve => {
-        setTimeout(() => resolve(token === runToken && !pausedByUser), duration);
-    });
-
-    const animateTo = (target, duration, token) => new Promise(resolve => {
-        const start = scrollContainer.scrollTop;
-        const distance = target - start;
-
-        if (Math.abs(distance) < 1) {
-            updateProgress();
-            resolve(token === runToken && !pausedByUser);
-            return;
+    function clearAutoTimers() {
+        if (scrollTimer) {
+            clearInterval(scrollTimer);
+            scrollTimer = null;
         }
 
-        const startTime = performance.now();
+        if (waitTimer) {
+            clearTimeout(waitTimer);
+            waitTimer = null;
+        }
+    }
 
-        const step = now => {
-            if (token !== runToken || pausedByUser) {
-                updateProgress();
-                resolve(false);
-                return;
-            }
-
-            const progress = Math.min((now - startTime) / duration, 1);
-            scrollContainer.scrollTo({ top: start + distance * progress });
-            updateProgress();
-
-            if (progress < 1) {
-                animationFrame = requestAnimationFrame(step);
-                return;
-            }
-
-            resolve(true);
-        };
-
-        animationFrame = requestAnimationFrame(step);
-    });
-
-    const runAutoScroll = async (waitBeforeStart) => {
-        const token = ++runToken;
+    function startScrolling() {
+        clearAutoTimers();
         pausedByUser = false;
-
-        if (waitBeforeStart && !await wait(waitMs, token)) {
-            return;
-        }
-
-        while (token === runToken && !pausedByUser) {
-            const maxScroll = getMaxScroll();
-            const distanceToBottom = Math.max(0, maxScroll - scrollContainer.scrollTop);
-
-            if (distanceToBottom > 1 && !await animateTo(maxScroll, Math.max(700, distanceToBottom * scrollMsPerPixel), token)) {
-                return;
-            }
-
-            if (!await wait(waitMs, token)) {
-                return;
-            }
-
-            if (!await animateTo(0, returnDuration, token)) {
-                return;
-            }
-
-            if (!await wait(waitMs, token)) {
-                return;
-            }
-        }
-    };
-
-    const pauseAutoScroll = () => {
-        pausedByUser = true;
-        runToken += 1;
-
-        if (animationFrame) {
-            cancelAnimationFrame(animationFrame);
-        }
-
-        clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(() => {
-            runAutoScroll(false);
-        }, resumeAfterManualMs);
-    };
-
-    const scrollByKey = event => {
-        if (!scrollKeys.has(event.key)) {
-            return;
-        }
-
-        pauseAutoScroll();
-        event.preventDefault();
-
-        const pageStep = scrollContainer.clientHeight * 0.85;
-        const smallStep = 70;
-        let target = scrollContainer.scrollTop;
-
-        switch (event.key) {
-            case "ArrowDown":
-                target += smallStep;
-                break;
-            case "ArrowUp":
-                target -= smallStep;
-                break;
-            case "PageDown":
-                target += pageStep;
-                break;
-            case "PageUp":
-                target -= pageStep;
-                break;
-            case "Home":
-                target = 0;
-                break;
-            case "End":
-                target = getMaxScroll();
-                break;
-            default:
-                target += event.shiftKey ? -pageStep : pageStep;
-                break;
-        }
-
-        scrollContainer.scrollTo({ top: Math.max(0, Math.min(getMaxScroll(), target)) });
         updateProgress();
-    };
+
+        if (getMaxScroll() <= 1) {
+            return;
+        }
+
+        scrollTimer = setInterval(scrollStep, scrollMsPerPixel);
+    }
+
+    function scheduleStart(delay) {
+        clearAutoTimers();
+        waitTimer = setTimeout(startScrolling, delay);
+    }
+
+    function scrollStep() {
+        if (pausedByUser) {
+            return;
+        }
+
+        var maxScroll = getMaxScroll();
+
+        if (getScrollTop() >= maxScroll - 1) {
+            clearAutoTimers();
+            updateProgress();
+
+            waitTimer = setTimeout(function () {
+                markProgrammaticScroll();
+                window.scrollTo(0, 0);
+                updateProgress();
+                scheduleStart(waitMs);
+            }, waitMs);
+
+            return;
+        }
+
+        markProgrammaticScroll();
+        window.scrollBy(0, 1);
+        updateProgress();
+    }
+
+    function pauseAutoScroll() {
+        pausedByUser = true;
+        clearAutoTimers();
+        clearTimeout(resumeTimer);
+
+        resumeTimer = setTimeout(function () {
+            pausedByUser = false;
+            startScrolling();
+        }, resumeAfterManualMs);
+    }
+
+    function handleScroll() {
+        updateProgress();
+
+        if (now() > programmaticScrollUntil) {
+            pauseAutoScroll();
+        }
+    }
+
+    function handleKeydown(event) {
+        if (scrollKeys[event.key]) {
+            pauseAutoScroll();
+        }
+    }
 
     updateProgress();
-    scrollContainer.addEventListener("scroll", updateProgress, { passive: true });
-    scrollContainer.addEventListener("wheel", pauseAutoScroll, { passive: true });
-    scrollContainer.addEventListener("touchstart", pauseAutoScroll, { passive: true });
-    scrollContainer.addEventListener("touchmove", pauseAutoScroll, { passive: true });
-    scrollContainer.addEventListener("mousedown", pauseAutoScroll);
-    window.addEventListener("resize", updateProgress);
-    window.addEventListener("keydown", scrollByKey);
+    window.addEventListener("scroll", handleScroll, false);
+    window.addEventListener("wheel", pauseAutoScroll, false);
+    window.addEventListener("touchstart", pauseAutoScroll, false);
+    window.addEventListener("touchmove", pauseAutoScroll, false);
+    window.addEventListener("mousedown", pauseAutoScroll, false);
+    window.addEventListener("keydown", handleKeydown, false);
+    window.addEventListener("resize", updateProgress, false);
 
-    runAutoScroll(true);
+    scheduleStart(waitMs);
 })();
