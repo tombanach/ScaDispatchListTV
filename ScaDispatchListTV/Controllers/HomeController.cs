@@ -39,10 +39,16 @@ namespace ScaDispatchListTV.Controllers
             {
                 con.Open();
                 com.Connection = con;
-                com.CommandText = "SELECT Klient, Zamówienie, Nazwa, [Il.zam], ISNULL(Got, 0) Got, [Data wys] " +
-                    "FROM SmayDB.dbo.ExScaDispatchListWMS_TEMP " +
-                    "WHERE ([Data wys] = CAST( GETDATE() AS Date )) " +
-                    "ORDER BY Klient";
+                com.CommandText = @"SELECT TOP (100)
+                                        Klient,
+                                        Zamówienie,
+                                        Nazwa,
+                                        [Il.zam],
+                                        ISNULL(Got, 0) AS Got,
+                                        [Data wys]
+                                    FROM SmayDB.dbo.ExScaDispatchListTV_WMS
+                                    WHERE [Data wys] = CAST(GETDATE() AS date)
+                                    ORDER BY Klient, Zamówienie";
                 dr = com.ExecuteReader();
                 while (dr.Read())
                 {

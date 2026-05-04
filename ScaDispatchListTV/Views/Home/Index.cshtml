@@ -1,6 +1,12 @@
-﻿@{
+@model IEnumerable<Order>
+@using System.Globalization
+
+@{
     ViewData["Title"] = "ScaDispatchListTV";
-    string[] TableHeaders = new string[] 
+    var rows = Model == null ? new List<Order>() : Model.ToList();
+    var renderTime = DateTime.Now;
+    var displayDate = DateTime.Today.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture);
+    string[] tableHeaders = new string[]
     {
         "Klient",
         "Zamówienie",
@@ -11,41 +17,142 @@
     };
 }
 
-
-<h2 class="header">ScaDispatchList</h2>
-
-<body>
-    <table class="table">
-        <thead>
-            <tr>
-                @{
-                    foreach (var head in TableHeaders)
-                    {
-                        <th>
-                            @head
-                        </th>
-                    }
-                }
-            </tr>
-        </thead>
-        
-        <tbody>
-            @{
-            if (Model != null)
-            {
-                foreach (var Data in Model)
-                {
-                    <tr class="active-row">                        
-                        <td>@Data.Klient</td>
-                        <td>@Data.Zamowienie</td>                        
-                        <td>@Data.Nazwa</td>
-                        <td>@Data.IlZam</td>
-                        <td>@Data.Got</td>
-                        <td>@Data.DataWys</td>
-                    </tr>
-                }
-            }
+@functions {
+    private static decimal ParseDecimal(string value)
+    {
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out var currentValue))
+        {
+            return currentValue;
         }
-        </tbody>
-    </table>
-</body>
+
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var invariantValue))
+        {
+            return invariantValue;
+        }
+
+        return 0;
+    }
+
+    private static string FormatQuantity(string value)
+    {
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out var currentValue))
+        {
+            return currentValue.ToString("0.##", CultureInfo.CurrentCulture);
+        }
+
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var invariantValue))
+        {
+            return invariantValue.ToString("0.##", CultureInfo.CurrentCulture);
+        }
+
+        return value;
+    }
+
+    private static string FormatPercent(decimal value)
+    {
+        return value.ToString("0.##", CultureInfo.CurrentCulture) + "%";
+    }
+
+    private static string FormatDate(string value)
+    {
+        if (DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out var currentDate))
+        {
+            return currentDate.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture);
+        }
+
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var invariantDate))
+        {
+            return invariantDate.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture);
+        }
+
+        return value;
+    }
+
+    private static string GetGotClass(decimal got)
+    {
+        if (got >= 100)
+        {
+            return "got-complete";
+        }
+
+        if (got > 0)
+        {
+            return "got-progress";
+        }
+
+        return "got-empty";
+    }
+
+    private static string GetRowClass(decimal got)
+    {
+        if (got >= 100)
+        {
+            return "row-complete";
+        }
+
+        if (got > 0)
+        {
+            return "row-progress";
+        }
+
+        return "row-empty";
+    }
+}
+
+<section class="tv-page">
+    <div class="tv-header">
+        <div class="top-status">
+            <div class="status-title">ScaDispatchList</div>
+            <div class="status-meta">
+                <span>Data: @displayDate</span>
+                <span>Odświeżono: @renderTime.ToString("HH:mm:ss", CultureInfo.CurrentCulture)</span>
+                <span>Pozycji: @rows.Count</span>
+            </div>
+        </div>
+        <div class="scroll-progress" aria-hidden="true">
+            <div class="scroll-progress-bar"></div>
+        </div>
+    </div>
+
+    @if (rows.Count == 0)
+    {
+        <div class="empty-state">Brak pozycji do wyświetlenia</div>
+    }
+    else
+    {
+        <div class="column-header-bar" aria-hidden="true">
+            @foreach (var head in tableHeaders)
+            {
+                <div>@head</div>
+            }
+        </div>
+        <div class="table-scroll-container" tabindex="0">
+            <table class="dispatch-table">
+                <colgroup>
+                    <col class="col-client" />
+                    <col class="col-order" />
+                    <col class="col-name" />
+                    <col class="col-qty" />
+                    <col class="col-ready" />
+                    <col class="col-date" />
+                </colgroup>
+                <tbody>
+                    @foreach (var order in rows)
+                    {
+                        var got = ParseDecimal(order.Got);
+                        <tr class="@GetRowClass(got)">
+                            <td>@order.Klient</td>
+                            <td>@order.Zamowienie</td>
+                            <td>@order.Nazwa</td>
+                            <td class="numeric">@FormatQuantity(order.IlZam)</td>
+                            <td class="got-cell">
+                                <span class="got-badge @GetGotClass(got)">@FormatPercent(got)</span>
+                            </td>
+                            <td>@FormatDate(order.DataWys)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
